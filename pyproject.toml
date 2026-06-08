@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "oqaasileriffik-downstream"
+version = "0.1.0"
+description = "Oqaasileriffik conversion downstream pipeline"
+dependencies = [
+    # Add runtime dependencies here (e.g. odfpy, jsonschema, nltk)
+]
+
+[project.optional-dependencies]
+dev = [
+    "mypy>=1.6.0",
+    "pytest>=7.4.0",
+    "ruff>=0.1.0"
+]
