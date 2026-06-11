@@ -30,11 +30,12 @@ def write_atomic(path: Path, data: Any, indent: int | None = 2) -> None:
             except OSError:
                 pass
         os.replace(tmp_path, path)
-    finally:
+    except BaseException:
         try:
             tmp_path.unlink(missing_ok=True)
         except OSError:
             pass
+        raise
 
 
 def validate_output(data: dict[str, Any], schema_path: Path) -> None:
