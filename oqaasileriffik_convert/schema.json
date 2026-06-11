@@ -7,6 +7,11 @@
       "type": "object",
       "required": ["schema_version", "license", "attribution", "generated_at", "source_repo"],
       "properties": {
+        "schema_version": { "type": "string" },
+        "license": { "type": "string" },
+        "attribution": { "type": "string" },
+        "generated_at": { "type": "string" },
+        "source_repo": { "type": "string" },
         "available_fields": {
           "type": "array",
           "items": { "type": "string" }

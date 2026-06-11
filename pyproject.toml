@@ -18,9 +18,9 @@ convert-data = "oqaasileriffik_convert.convert:main"
 
 [project.optional-dependencies]
 dev = [
-    "mypy>=1.6.0",
-    "pytest>=7.4.0",
-    "ruff>=0.1.0",
+    "mypy==1.6.0",
+    "pytest==7.4.0",
+    "ruff==0.1.0",
     "types-jsonschema"
 ]
 
