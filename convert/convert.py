@@ -21,8 +21,10 @@ def write_atomic(path: Path, data: Any, indent: int | None = 2) -> None:
         tmp.write_text(json.dumps(data, ensure_ascii=False, indent=indent), encoding='utf-8')
         os.replace(tmp, path)
     finally:
-        if tmp.exists():
-            tmp.unlink()
+        try:
+            tmp.unlink(missing_ok=True)
+        except OSError:
+            pass
 
 
 def validate_output(data: dict, schema_path: Path) -> None:
@@ -64,7 +66,7 @@ def main() -> None:
 
     # Paths
     root_dir = Path(__file__).parent.parent.resolve()
-    schema_path = root_dir / "convert" / "schema.json"
+    schema_path = Path(__file__).resolve().parent / "schema.json"
     extracted_dir = root_dir / "extracted"
 
     # Create output directory
