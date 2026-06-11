@@ -104,8 +104,8 @@ def main() -> None:
 
     try:
         validate_output(envelope, schema_path)
-    except FileNotFoundError:
-        log.error(f"Schema file not found at {schema_path}")
+    except OSError as e:
+        log.error(f"Failed to read schema file at {schema_path}: {e}")
         sys.exit(1)
     except json.JSONDecodeError as e:
         log.error(f"Schema file at {schema_path} is not valid JSON: {e}")
@@ -119,7 +119,11 @@ def main() -> None:
 
     # Write source_map.json
     source_map_path = extracted_dir / "source_map.json"
-    write_atomic(source_map_path, envelope)
+    try:
+        write_atomic(source_map_path, envelope)
+    except OSError as e:
+        log.error(f"Failed to write output to {source_map_path}: {e}")
+        sys.exit(1)
     log.info(f"Successfully wrote {source_map_path}")
 
 
