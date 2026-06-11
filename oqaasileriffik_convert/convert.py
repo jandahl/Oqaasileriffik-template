@@ -38,6 +38,14 @@ def write_atomic(path: Path, data: Any, indent: int | None = 2) -> None:
         raise
 
 
+def write_atomic_safe(path: Path, data: Any, indent: int | None = 2, error_msg: str = "Failed to write") -> None:
+    try:
+        write_atomic(path, data, indent=indent)
+    except OSError as e:
+        log.error("%s %s: %s", error_msg, path, e)
+        sys.exit(1)
+
+
 def validate_output(data: dict[str, Any], schema_path: Path) -> None:
     """Validate data against the JSON Schema."""
     schema = json.loads(schema_path.read_text(encoding='utf-8'))
@@ -120,11 +128,7 @@ def main() -> None:
 
     # Write source_map.json
     source_map_path = extracted_dir / "source_map.json"
-    try:
-        write_atomic(source_map_path, envelope)
-    except OSError as e:
-        log.error(f"Failed to write output to {source_map_path}: {e}")
-        sys.exit(1)
+    write_atomic_safe(source_map_path, envelope, error_msg="Failed to write output to")
     log.info(f"Successfully wrote {source_map_path}")
 
 
