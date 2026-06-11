@@ -116,6 +116,9 @@ def main() -> None:
     except json.JSONDecodeError as e:
         log.error(f"Schema file at {schema_path} is not valid JSON: {e}")
         sys.exit(1)
+    except jsonschema.SchemaError as e:
+        log.error(f"Schema file at {schema_path} is itself invalid: {e.message}")
+        sys.exit(1)
     except jsonschema.ValidationError as e:
         log.error(f"Schema validation failed: {e.message}")
         sys.exit(1)
