@@ -16,25 +16,38 @@ log = logging.getLogger(__name__)
 
 def write_atomic(path: Path, data: Any, indent: int | None = 2) -> None:
     """Safely write JSON data to path using an atomic rename."""
-    tmp = path.with_suffix('.tmp')
+    import tempfile
+    parent = path.parent
+    tmp_file = None
     try:
-        tmp.write_text(json.dumps(data, ensure_ascii=False, indent=indent), encoding='utf-8')
-        os.replace(tmp, path)
+        with tempfile.NamedTemporaryFile(
+            'w',
+            dir=parent,
+            prefix=path.name + '.',
+            suffix='.tmp',
+            encoding='utf-8',
+            delete=False
+        ) as f:
+            tmp_file = Path(f.name)
+            json.dump(data, f, ensure_ascii=False, indent=indent)
+        os.replace(tmp_file, path)
+        tmp_file = None
     finally:
-        try:
-            tmp.unlink(missing_ok=True)
-        except OSError:
-            pass
+        if tmp_file is not None:
+            try:
+                tmp_file.unlink(missing_ok=True)
+            except OSError:
+                pass
 
 
-def validate_output(data: dict, schema_path: Path) -> None:
+def validate_output(data: dict[str, Any], schema_path: Path) -> None:
     """Validate data against the JSON Schema."""
     schema = json.loads(schema_path.read_text(encoding='utf-8'))
     jsonschema.validate(instance=data, schema=schema)
     log.info("Schema validation passed")
 
 
-def extract_data(input_dir: Path) -> list[dict]:
+def extract_data(input_dir: Path) -> list[dict[str, Any]]:
     """
     TODO: Implement parsing logic for the specific upstream data source.
     Return a list of raw entries in the format:
@@ -94,6 +107,12 @@ def main() -> None:
 
     try:
         validate_output(envelope, schema_path)
+    except FileNotFoundError:
+        log.error(f"Schema file not found at {schema_path}")
+        sys.exit(1)
+    except json.JSONDecodeError as e:
+        log.error(f"Schema file at {schema_path} is not valid JSON: {e}")
+        sys.exit(1)
     except jsonschema.ValidationError as e:
         log.error(f"Schema validation failed: {e.message}")
         sys.exit(1)
