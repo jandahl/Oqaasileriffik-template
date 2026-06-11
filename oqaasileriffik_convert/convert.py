@@ -25,14 +25,16 @@ def write_atomic(path: Path, data: Any, indent: int | None = 2) -> None:
             json.dump(data, f, ensure_ascii=False, indent=indent)
             f.write("\n")
             f.flush()
-            os.fsync(f.fileno())
+            try:
+                os.fsync(f.fileno())
+            except OSError:
+                pass
         os.replace(tmp_path, path)
-    except Exception:
+    finally:
         try:
             tmp_path.unlink(missing_ok=True)
         except OSError:
             pass
-        raise
 
 
 def validate_output(data: dict[str, Any], schema_path: Path) -> None:
