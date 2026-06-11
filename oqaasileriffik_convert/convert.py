@@ -120,13 +120,13 @@ def main() -> None:
 
     # Write source_map.json
     source_map_path = extracted_dir / "source_map.json"
-    try:
-        write_atomic(source_map_path, envelope)
-    except OSError as e:
-        log.error(f"Failed to write output to {source_map_path}: {e}")
-        sys.exit(1)
+    write_atomic(source_map_path, envelope)
     log.info(f"Successfully wrote {source_map_path}")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except OSError as e:
+        log.error("File operation failed: %s", e)
+        sys.exit(1)
