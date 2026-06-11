@@ -6,7 +6,7 @@ It provides a standardized environment including:
 * Python 3.10+ virtual environment bootstrapping (`scripts/bootstrap_venv.sh`)
 * Linting and formatting with `ruff`
 * Type checking with `mypy`
-* Standardized `UPSTREAM_MAP_DESIGN` envelope validation (`convert/schema.json`)
+* Standardized `UPSTREAM_MAP_DESIGN` envelope validation (`oqaasileriffik_convert/schema.json`)
 * Standardized AI agent instructions (`AGENTS.md`)
 
 ## Getting Started
@@ -17,7 +17,7 @@ It provides a standardized environment including:
    ./scripts/bootstrap_venv.sh
    source .venv/bin/activate
    ```
-3. Update `convert/convert.py` with the specific extraction logic for your upstream dataset.
+3. Update `oqaasileriffik_convert/convert.py` with the specific extraction logic for your upstream dataset.
 4. Update `pyproject.toml` with any specific dependencies (e.g. `odfpy`, `openpyxl`).
 5. Ensure your script outputs a valid `extracted/source_map.json` using the provided schema.
 

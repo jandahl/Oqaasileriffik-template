@@ -18,6 +18,7 @@ def write_atomic(path: Path, data: Any, indent: int | None = 2) -> None:
     """Safely write JSON data to path using an atomic rename."""
     import tempfile
     parent = path.parent
+    parent.mkdir(parents=True, exist_ok=True)
     tmp_file = None
     try:
         with tempfile.NamedTemporaryFile(
@@ -30,6 +31,7 @@ def write_atomic(path: Path, data: Any, indent: int | None = 2) -> None:
         ) as f:
             tmp_file = Path(f.name)
             json.dump(data, f, ensure_ascii=False, indent=indent)
+            f.write("\n")
         os.replace(tmp_file, path)
         tmp_file = None
     finally:
@@ -78,8 +80,9 @@ def main() -> None:
         sys.exit(1)
 
     # Paths
-    root_dir = Path(__file__).parent.parent.resolve()
-    schema_path = Path(__file__).resolve().parent / "schema.json"
+    script_dir = Path(__file__).resolve().parent
+    root_dir = script_dir.parent
+    schema_path = script_dir / "schema.json"
     extracted_dir = root_dir / "extracted"
 
     # Create output directory

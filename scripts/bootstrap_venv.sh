@@ -6,7 +6,7 @@ ROOT_DIR="$(dirname "$DIR")"
 VENV_DIR="$ROOT_DIR/.venv"
 
 if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
-    VENV_PYTHON="$VENV_DIR/Scripts/python"
+    VENV_PYTHON="$VENV_DIR/Scripts/python.exe"
 else
     VENV_PYTHON="$VENV_DIR/bin/python"
 fi

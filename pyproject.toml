@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.scripts]
-convert-data = "convert.convert:main"
+convert-data = "oqaasileriffik_convert.convert:main"
 
 [project.optional-dependencies]
 dev = [
@@ -25,10 +25,10 @@ dev = [
 ]
 
 [tool.setuptools]
-packages = ["convert"]
+packages = ["oqaasileriffik_convert"]
 
 [tool.setuptools.package-data]
-convert = ["*.json"]
+oqaasileriffik_convert = ["*.json"]
 
 [tool.mypy]
 python_version = "3.10"
