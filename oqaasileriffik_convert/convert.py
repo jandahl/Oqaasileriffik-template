@@ -3,6 +3,7 @@ import argparse
 import json
 import logging
 import os
+import secrets
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -16,36 +17,22 @@ log = logging.getLogger(__name__)
 
 def write_atomic(path: Path, data: Any, indent: int | None = 2) -> None:
     """Safely write JSON data to path using an atomic rename."""
-    import tempfile
     parent = path.parent
     parent.mkdir(parents=True, exist_ok=True)
-    tmp_file = None
+    tmp_path = parent / f".{path.name}.{secrets.token_hex(8)}.tmp"
     try:
-        with tempfile.NamedTemporaryFile(
-            'w',
-            dir=parent,
-            prefix=path.name + '.',
-            suffix='.tmp',
-            encoding='utf-8',
-            delete=False
-        ) as f:
-            tmp_file = Path(f.name)
+        with open(tmp_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=indent)
             f.write("\n")
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp_path, path)
+    except Exception:
         try:
-            umask = os.umask(0)
-            os.umask(umask)
-            tmp_file.chmod(0o666 & ~umask)
+            tmp_path.unlink(missing_ok=True)
         except OSError:
             pass
-        os.replace(tmp_file, path)
-        tmp_file = None
-    finally:
-        if tmp_file is not None:
-            try:
-                tmp_file.unlink(missing_ok=True)
-            except OSError:
-                pass
+        raise
 
 
 def validate_output(data: dict[str, Any], schema_path: Path) -> None:
@@ -87,9 +74,8 @@ def main() -> None:
 
     # Paths
     script_dir = Path(__file__).resolve().parent
-    root_dir = script_dir.parent
     schema_path = script_dir / "schema.json"
-    extracted_dir = root_dir / "extracted"
+    extracted_dir = Path("extracted")
 
     # Create output directory
     extracted_dir.mkdir(parents=True, exist_ok=True)

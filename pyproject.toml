@@ -10,7 +10,7 @@ requires-python = ">=3.10"
 dependencies = [
     "odfpy==1.4.1",
     "jsonschema==4.23.0",
-    "nltk==3.8.1"
+    "nltk==3.9.1"
 ]
 
 [project.scripts]
@@ -18,9 +18,9 @@ convert-data = "oqaasileriffik_convert.convert:main"
 
 [project.optional-dependencies]
 dev = [
-    "mypy==1.6.0",
-    "pytest==7.4.0",
-    "ruff==0.1.0"
+    "mypy==1.15.0",
+    "pytest==8.3.0",
+    "ruff==0.9.0"
 ]
 
 [tool.setuptools]
@@ -39,6 +39,7 @@ check_untyped_defs = true
 disallow_untyped_decorators = false
 no_implicit_optional = true
 strict_optional = true
+ignore_missing_imports = true
 
 [tool.ruff]
 target-version = "py310"
