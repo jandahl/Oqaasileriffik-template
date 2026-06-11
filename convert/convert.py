@@ -11,7 +11,6 @@ from typing import Any
 import jsonschema
 
 # Configure basic logging
-logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 log = logging.getLogger(__name__)
 
 
@@ -54,9 +53,14 @@ def extract_data(input_dir: Path) -> list[dict]:
 
 
 def main() -> None:
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     parser = argparse.ArgumentParser(description="Oqaasileriffik Data Conversion Pipeline Template")
     parser.add_argument("--data-dir", type=Path, default=Path("data"), help="Path to input data directory")
     args = parser.parse_args()
+
+    if not args.data_dir.is_dir():
+        log.error(f"Data directory does not exist or is not a directory: {args.data_dir}")
+        sys.exit(1)
 
     # Paths
     root_dir = Path(__file__).parent.parent.resolve()
@@ -86,7 +90,11 @@ def main() -> None:
         "entries": source_map_entries
     }
 
-    validate_output(envelope, schema_path)
+    try:
+        validate_output(envelope, schema_path)
+    except jsonschema.ValidationError as e:
+        log.error(f"Schema validation failed: {e.message}")
+        sys.exit(1)
 
     # Write source_map.json
     source_map_path = extracted_dir / "source_map.json"

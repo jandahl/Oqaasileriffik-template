@@ -12,16 +12,22 @@ else
 fi
 
 if [ ! -x "$VENV_PYTHON" ]; then
-    if ! command -v python3 > /dev/null 2>&1; then
-        echo "Error: python3 is required but not installed." >&2
+    PYTHON_CMD=""
+    if command -v python3 > /dev/null 2>&1; then
+        PYTHON_CMD="python3"
+    elif command -v python > /dev/null 2>&1; then
+        PYTHON_CMD="python"
+    fi
+    if [ -z "$PYTHON_CMD" ]; then
+        echo "Error: Python is required but not installed." >&2
         exit 1
     fi
-    if ! python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)' 2>/dev/null; then
+    if ! "$PYTHON_CMD" -c 'import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)' 2>/dev/null; then
         echo "Error: Python 3.10 or higher is required." >&2
         exit 1
     fi
     echo "Creating virtual environment in $VENV_DIR..."
-    python3 -m venv "$VENV_DIR"
+    "$PYTHON_CMD" -m venv "$VENV_DIR"
 fi
 
 echo "Upgrading pip..."

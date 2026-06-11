@@ -40,3 +40,6 @@ check_untyped_defs = true
 disallow_untyped_decorators = false
 no_implicit_optional = true
 strict_optional = true
+
+[tool.ruff]
+target-version = "py310"
