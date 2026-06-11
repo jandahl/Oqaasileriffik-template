@@ -13,6 +13,11 @@ It provides a standardized environment including:
 
 1. Clone or generate your repository from this template.
 2. Run the bootstrap script to create the `.venv` and install all tools:
+
+   > [!WARNING]
+   > **Windows environments (including MSYS2, Cygwin, and MinGW) are explicitly NOT supported.**
+   > Do not attempt to run this pipeline or install dependencies on a Windows machine.
+
    ```bash
    ./scripts/bootstrap_venv.sh
    source .venv/bin/activate

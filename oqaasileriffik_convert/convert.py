@@ -123,7 +123,7 @@ def main() -> None:
     try:
         write_atomic(source_map_path, envelope)
     except OSError as e:
-        log.error(f"Failed to write output to {source_map_path}: {e}")
+        log.exception("Failed to write output to %s", source_map_path)
         sys.exit(1)
     log.info(f"Successfully wrote {source_map_path}")
 
