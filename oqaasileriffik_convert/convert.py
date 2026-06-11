@@ -32,6 +32,12 @@ def write_atomic(path: Path, data: Any, indent: int | None = 2) -> None:
             tmp_file = Path(f.name)
             json.dump(data, f, ensure_ascii=False, indent=indent)
             f.write("\n")
+        try:
+            umask = os.umask(0)
+            os.umask(umask)
+            tmp_file.chmod(0o666 & ~umask)
+        except OSError:
+            pass
         os.replace(tmp_file, path)
         tmp_file = None
     finally:
