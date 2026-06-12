@@ -67,6 +67,17 @@ def extract_data(input_dir: Path) -> list[dict[str, Any]]:
 
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+    try:
+        _main_impl()
+    except FileNotFoundError as e:
+        log.error("File not found: %s", e)
+        sys.exit(1)
+    except OSError:
+        log.exception("File operation failed")
+        sys.exit(1)
+
+
+def _main_impl() -> None:
     parser = argparse.ArgumentParser(description="Oqaasileriffik Data Conversion Pipeline Template")
     parser.add_argument("--data-dir", type=Path, default=Path("data"), help="Path to input data directory")
     args = parser.parse_args()
