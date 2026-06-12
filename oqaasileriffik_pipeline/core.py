@@ -13,11 +13,13 @@ import jsonschema  # type: ignore
 log = logging.getLogger(__name__)
 
 
-def write_atomic(path: Path, data: Any, indent: int | None = 2) -> None:
+def write_atomic(path: Path | str, data: Any, indent: int | None = 2) -> None:
     """Safely write JSON data to path using an atomic rename."""
+    path = Path(path)
     parent = path.parent
     parent.mkdir(parents=True, exist_ok=True)
     tmp_path = parent / f".{path.name}.{secrets.token_hex(8)}.tmp"
+    written = False
     try:
         with open(tmp_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=indent)
@@ -28,12 +30,13 @@ def write_atomic(path: Path, data: Any, indent: int | None = 2) -> None:
             except OSError:
                 pass
         os.replace(tmp_path, path)
-    except BaseException:
-        try:
-            tmp_path.unlink(missing_ok=True)
-        except OSError:
-            pass
-        raise
+        written = True
+    finally:
+        if not written:
+            try:
+                tmp_path.unlink(missing_ok=True)
+            except OSError:
+                pass
 
 
 def validate_output(data: dict[str, Any], schema: dict[str, Any]) -> None:
