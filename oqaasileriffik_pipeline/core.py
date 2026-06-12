@@ -64,16 +64,11 @@ class Pipeline:
     def __init__(self, extractor_func: Callable[[Path], list[dict[str, Any]]], schema_path: Path, meta: dict[str, Any]):
         self.extractor_func = extractor_func
         self.schema_path = schema_path
-        self.meta = meta
+        self.meta = meta.copy()
 
-    def _run_impl(self) -> None:
-        parser = argparse.ArgumentParser(description="Oqaasileriffik Data Conversion Pipeline")
-        parser.add_argument("--data-dir", type=Path, default=Path("data"), help="Path to input data directory")
-        args = parser.parse_args()
-
-        if not args.data_dir.is_dir():
-            log.error(f"Data directory does not exist or is not a directory: {args.data_dir}")
-            sys.exit(1)
+    def _run_impl(self, data_dir: Path) -> None:
+        if not data_dir.is_dir():
+            raise FileNotFoundError(f"Data directory does not exist or is not a directory: {data_dir}")
 
         extracted_dir = Path("extracted")
         extracted_dir.mkdir(parents=True, exist_ok=True)
@@ -82,7 +77,7 @@ class Pipeline:
         self.meta["generated_at"] = datetime.now(timezone.utc).isoformat()
 
         log.info("Starting data extraction...")
-        source_map_entries = self.extractor_func(args.data_dir)
+        source_map_entries = self.extractor_func(data_dir)
         log.info(f"Extracted {len(source_map_entries)} entries.")
 
         envelope = {
@@ -92,30 +87,14 @@ class Pipeline:
 
         try:
             validate_output(envelope, self.schema_path)
-        except OSError as e:
-            log.error(f"Failed to read schema file at {self.schema_path}: {e}")
-            sys.exit(1)
-        except json.JSONDecodeError as e:
-            log.error(f"Schema file at {self.schema_path} is not valid JSON: {e}")
-            sys.exit(1)
-        except jsonschema.SchemaError as e:
-            log.error(f"Schema file at {self.schema_path} is itself invalid: {e.message}")
-            sys.exit(1)
-        except jsonschema.ValidationError as e:
-            log.error(f"Schema validation failed: {e.message}")
-            sys.exit(1)
+        except (OSError, json.JSONDecodeError, jsonschema.SchemaError, jsonschema.ValidationError) as e:
+            log.error(f"Schema validation or read failed: {e}")
+            raise
 
         source_map_path = extracted_dir / "source_map.json"
         write_atomic(source_map_path, envelope)
         log.info(f"Successfully wrote {source_map_path}")
 
-    def run(self) -> None:
+    def run(self, data_dir: Path = Path("data")) -> None:
         logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
-        try:
-            self._run_impl()
-        except FileNotFoundError as e:
-            log.error("File not found: %s", e)
-            sys.exit(1)
-        except OSError:
-            log.exception("File operation failed")
-            sys.exit(1)
+        self._run_impl(data_dir)
