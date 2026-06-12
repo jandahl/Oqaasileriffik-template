@@ -131,7 +131,11 @@ def _main_impl() -> None:
 
     # Write source_map.json
     source_map_path = extracted_dir / "source_map.json"
-    write_atomic(source_map_path, envelope)
+    try:
+        write_atomic(source_map_path, envelope)
+    except OSError as e:
+        log.error(f"Failed to write output to {source_map_path}: {e}")
+        sys.exit(1)
     log.info(f"Successfully wrote {source_map_path}")
 
 
