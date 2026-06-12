@@ -4,7 +4,6 @@ import logging
 import os
 import secrets
 from datetime import datetime, timezone
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
 
@@ -72,6 +71,7 @@ class Pipeline:
         log.info("Starting data extraction...")
         source_map_entries = self.extractor_func(data_dir)
         log.info(f"Extracted {len(source_map_entries)} entries.")
+
 
         envelope = {
             "meta": self.meta,

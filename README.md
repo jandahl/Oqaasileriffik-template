@@ -33,6 +33,7 @@ It enforces a standardized, bulletproof environment including:
 
    if __name__ == "__main__":
        meta = {
+           "schema_version": "1.0",
            "license": "MPL-2.0 (Mozilla Public License 2.0) + Rights Reserved",
            "attribution": "Upstream Author",
            "source_repo": "https://github.com/...",
