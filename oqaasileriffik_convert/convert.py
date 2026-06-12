@@ -66,6 +66,17 @@ def extract_data(input_dir: Path) -> list[dict[str, Any]]:
 
 
 def main() -> None:
+    try:
+        _main_impl()
+    except FileNotFoundError as e:
+        log.error("File not found: %s", e)
+        sys.exit(1)
+    except OSError:
+        log.exception("File operation failed")
+        sys.exit(1)
+
+
+def _main_impl() -> None:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     parser = argparse.ArgumentParser(description="Oqaasileriffik Data Conversion Pipeline Template")
     parser.add_argument("--data-dir", type=Path, default=Path("data"), help="Path to input data directory")
@@ -120,11 +131,7 @@ def main() -> None:
 
     # Write source_map.json
     source_map_path = extracted_dir / "source_map.json"
-    try:
-        write_atomic(source_map_path, envelope)
-    except OSError as e:
-        log.error(f"Failed to write output to {source_map_path}: {e}")
-        sys.exit(1)
+    write_atomic(source_map_path, envelope)
     log.info(f"Successfully wrote {source_map_path}")
 
 
