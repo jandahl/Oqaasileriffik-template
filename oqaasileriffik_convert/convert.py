@@ -30,11 +30,16 @@ def write_atomic(path: Path, data: Any, indent: int | None = 2) -> None:
             except OSError:
                 pass
         os.replace(tmp_path, path)
-    except BaseException:
+    except BaseException as e:
         try:
             tmp_path.unlink(missing_ok=True)
         except OSError:
             pass
+        if isinstance(e, OSError):
+            if e.filename == str(tmp_path):
+                e.filename = str(path)
+            if e.filename2 == str(tmp_path):
+                e.filename2 = str(path)
         raise
 
 
@@ -131,11 +136,7 @@ def _main_impl() -> None:
 
     # Write source_map.json
     source_map_path = extracted_dir / "source_map.json"
-    try:
-        write_atomic(source_map_path, envelope)
-    except OSError as e:
-        log.error(f"Failed to write output to {source_map_path}: {e}")
-        sys.exit(1)
+    write_atomic(source_map_path, envelope)
     log.info(f"Successfully wrote {source_map_path}")
 
 
