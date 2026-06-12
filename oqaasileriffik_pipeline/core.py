@@ -75,6 +75,8 @@ class Pipeline:
 
         log.info("Starting data extraction...")
         source_map_entries = self.extractor_func(data_dir)
+        if source_map_entries is None:
+            raise ValueError("The extractor function returned None. It must return a list of entries.")
         log.info(f"Extracted {len(source_map_entries)} entries.")
 
 

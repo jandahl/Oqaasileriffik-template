@@ -76,6 +76,25 @@ def test_pipeline_successful_run(tmp_path: Path, valid_schema_path: Path, mock_e
     assert result["entries"][0]["value"] == "test"
 
 
+def test_pipeline_extractor_returns_none(tmp_path: Path, valid_schema_path: Path) -> None:
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    out_dir = tmp_path / "extracted"
+
+    def none_extractor(path: Path) -> Any:
+        return None
+
+    pipeline = Pipeline(
+        extractor_func=none_extractor,
+        schema_path=valid_schema_path,
+        meta={},
+        output_dir=out_dir
+    )
+
+    with pytest.raises(ValueError, match="The extractor function returned None. It must return a list of entries."):
+        pipeline.run(data_dir)
+
+
 def test_pipeline_schema_validation_failure(tmp_path: Path, valid_schema_path: Path) -> None:
     data_dir = tmp_path / "data"
     data_dir.mkdir()
