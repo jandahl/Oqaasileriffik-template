@@ -38,7 +38,9 @@ def write_atomic(path: Path, data: Any, indent: int | None = 2) -> None:
         if isinstance(e, OSError):
             if e.filename == str(tmp_path):
                 e.filename = str(path)
-            if e.filename2 == str(tmp_path):
+                if e.filename2 == str(path):
+                    e.filename2 = None
+            elif e.filename2 == str(tmp_path):
                 e.filename2 = str(path)
         raise
 
