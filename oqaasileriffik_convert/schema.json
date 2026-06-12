@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["meta", "entries"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["schema_version", "license", "attribution", "generated_at", "source_repo"],
+      "properties": {
+        "schema_version": { "type": "string" },
+        "license": { "type": "string" },
+        "attribution": { "type": "string" },
+        "generated_at": { "type": "string" },
+        "source_repo": { "type": "string" },
+        "available_fields": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["source_id", "raw_data"],
+        "properties": {
+          "source_id": { "type": "string" },
+          "raw_data": {
+            "type": "object",
+            "properties": {
+              "lexeme": { "type": "string" },
+              "word_class": { "type": "string" },
+              "gloss_en": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

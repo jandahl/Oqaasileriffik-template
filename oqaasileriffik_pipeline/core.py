@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-import argparse
 import json
 import logging
 import os
 import secrets
-import sys
+from datetime import datetime, timezone
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
@@ -36,20 +35,14 @@ def write_atomic(path: Path, data: Any, indent: int | None = 2) -> None:
         except OSError:
             pass
         if isinstance(e, OSError):
-            if e.filename == str(tmp_path):
-                e.filename = str(path)
-            if e.filename2 == str(tmp_path):
-                e.filename2 = str(path)
-            if e.filename == str(path) and e.filename2 == str(path):
-                e.filename2 = None
-
-            # Reconstruct e.args to prevent the temporary path from leaking via args
             args = list(e.args)
-            if len(args) > 2:
-                args[2] = e.filename
-            if len(args) > 4:
-                args[4] = e.filename2
-            e.args = tuple(args)
+            if len(args) > 2 and args[2] == str(tmp_path):
+                args[2] = str(path)
+            if len(args) > 4 and args[4] == str(tmp_path):
+                args[4] = str(path)
+            if len(args) > 4 and args[2] == args[4]:
+                args[4] = None
+            raise type(e)(*args) from e
         raise
 
 
@@ -96,5 +89,4 @@ class Pipeline:
         log.info(f"Successfully wrote {source_map_path}")
 
     def run(self, data_dir: Path = Path("data")) -> None:
-        logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
         self._run_impl(data_dir)
