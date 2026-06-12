@@ -3,18 +3,15 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "oqaasileriffik-template"
+name = "oqaasileriffik-pipeline"
 version = "0.1.0"
-description = "Oqaasileriffik data extraction pipeline template"
+description = "Oqaasileriffik data extraction core pipeline"
 requires-python = ">=3.10"
 dependencies = [
     "odfpy==1.4.1",
     "jsonschema==4.23.0",
     "nltk==3.9.1"
 ]
-
-[project.scripts]
-convert-data = "oqaasileriffik_convert.convert:main"
 
 [project.optional-dependencies]
 dev = [
@@ -24,10 +21,7 @@ dev = [
 ]
 
 [tool.setuptools]
-packages = ["oqaasileriffik_convert"]
-
-[tool.setuptools.package-data]
-oqaasileriffik_convert = ["*.json"]
+packages = ["oqaasileriffik_pipeline"]
 
 [tool.mypy]
 python_version = "3.10"
