@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
 
-import jsonschema
+import jsonschema  # type: ignore
 
 # Configure basic logging
 log = logging.getLogger(__name__)
@@ -28,26 +28,16 @@ def write_atomic(path: Path, data: Any, indent: int | None = 2) -> None:
             except OSError:
                 pass
         os.replace(tmp_path, path)
-    except BaseException as e:
+    except BaseException:
         try:
             tmp_path.unlink(missing_ok=True)
         except OSError:
             pass
-        if isinstance(e, OSError):
-            args = list(e.args)
-            if len(args) > 2 and args[2] == str(tmp_path):
-                args[2] = str(path)
-            if len(args) > 4 and args[4] == str(tmp_path):
-                args[4] = str(path)
-            if len(args) > 4 and args[2] == args[4]:
-                args[4] = None
-            raise type(e)(*args) from e
         raise
 
 
-def validate_output(data: dict[str, Any], schema_path: Path) -> None:
+def validate_output(data: dict[str, Any], schema: dict[str, Any]) -> None:
     """Validate data against the JSON Schema."""
-    schema = json.loads(schema_path.read_text(encoding='utf-8'))
     jsonschema.validate(instance=data, schema=schema)
     log.info("Schema validation passed")
 
@@ -64,6 +54,12 @@ class Pipeline:
         self.schema_path = Path(schema_path)
         self.meta = meta.copy()
         self.output_dir = Path(output_dir)
+
+        # Load and parse schema early to fail fast if it is missing or invalid
+        try:
+            self.schema = json.loads(self.schema_path.read_text(encoding='utf-8'))
+        except Exception as e:
+            raise ValueError(f"Failed to load schema from {schema_path}: {e}") from e
 
     def _run_impl(self, data_dir: Path) -> None:
         if not data_dir.is_dir():
@@ -85,9 +81,9 @@ class Pipeline:
         }
 
         try:
-            validate_output(envelope, self.schema_path)
-        except (OSError, json.JSONDecodeError, jsonschema.SchemaError, jsonschema.ValidationError) as e:
-            log.error(f"Schema validation or read failed: {e}")
+            validate_output(envelope, self.schema)
+        except (jsonschema.SchemaError, jsonschema.ValidationError) as e:
+            log.error(f"Schema validation failed: {e}")
             raise
 
         source_map_path = self.output_dir / "source_map.json"
