@@ -75,8 +75,8 @@ class Pipeline:
 
         log.info("Starting data extraction...")
         source_map_entries = self.extractor_func(data_dir)
-        if source_map_entries is None:
-            raise ValueError("The extractor function returned None. It must return a list of entries.")
+        if not isinstance(source_map_entries, list):
+            raise TypeError(f"The extractor function must return a list of entries, got {type(source_map_entries).__name__}")
         log.info(f"Extracted {len(source_map_entries)} entries.")
 
 

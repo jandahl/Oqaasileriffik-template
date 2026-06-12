@@ -91,25 +91,40 @@ def test_pipeline_extractor_returns_none(tmp_path: Path, valid_schema_path: Path
         output_dir=out_dir
     )
 
-    with pytest.raises(ValueError, match="The extractor function returned None. It must return a list of entries."):
+    with pytest.raises(TypeError, match="The extractor function must return a list of entries, got NoneType"):
         pipeline.run(data_dir)
 
 
-def test_pipeline_schema_validation_failure(tmp_path: Path, valid_schema_path: Path) -> None:
+def test_pipeline_schema_validation_failure(tmp_path: Path) -> None:
     data_dir = tmp_path / "data"
     data_dir.mkdir()
     out_dir = tmp_path / "extracted"
-    
+
+    schema_path = tmp_path / "schema.json"
+    schema = {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+            "meta": {"type": "object"},
+            "entries": {
+                "type": "array",
+                "items": {"type": "object"}
+            }
+        },
+        "required": ["meta", "entries"]
+    }
+    schema_path.write_text(json.dumps(schema), encoding='utf-8')
+
     def bad_extractor(path: Path) -> Any:
-        return "not an array"
-        
+        return [1, 2, 3]
+
     pipeline = Pipeline(
         extractor_func=bad_extractor,
-        schema_path=valid_schema_path,
+        schema_path=schema_path,
         meta={},
         output_dir=out_dir
     )
-    
+
     with pytest.raises(jsonschema.ValidationError):
         pipeline.run(data_dir)
         
