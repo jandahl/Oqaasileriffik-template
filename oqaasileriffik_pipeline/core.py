@@ -53,17 +53,23 @@ def validate_output(data: dict[str, Any], schema_path: Path) -> None:
 
 
 class Pipeline:
-    def __init__(self, extractor_func: Callable[[Path], list[dict[str, Any]]], schema_path: Path, meta: dict[str, Any]):
+    def __init__(
+        self,
+        extractor_func: Callable[[Path], list[dict[str, Any]]],
+        schema_path: Path | str,
+        meta: dict[str, Any],
+        output_dir: Path | str = Path("extracted")
+    ):
         self.extractor_func = extractor_func
-        self.schema_path = schema_path
+        self.schema_path = Path(schema_path)
         self.meta = meta.copy()
+        self.output_dir = Path(output_dir)
 
     def _run_impl(self, data_dir: Path) -> None:
         if not data_dir.is_dir():
             raise FileNotFoundError(f"Data directory does not exist or is not a directory: {data_dir}")
 
-        extracted_dir = Path("extracted")
-        extracted_dir.mkdir(parents=True, exist_ok=True)
+        self.output_dir.mkdir(parents=True, exist_ok=True)
 
         # Update metadata timestamp automatically
         self.meta["generated_at"] = datetime.now(timezone.utc).isoformat()
@@ -84,9 +90,9 @@ class Pipeline:
             log.error(f"Schema validation or read failed: {e}")
             raise
 
-        source_map_path = extracted_dir / "source_map.json"
+        source_map_path = self.output_dir / "source_map.json"
         write_atomic(source_map_path, envelope)
         log.info(f"Successfully wrote {source_map_path}")
 
-    def run(self, data_dir: Path = Path("data")) -> None:
-        self._run_impl(data_dir)
+    def run(self, data_dir: Path | str = Path("data")) -> None:
+        self._run_impl(Path(data_dir))

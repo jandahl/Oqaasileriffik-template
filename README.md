@@ -17,7 +17,7 @@ It enforces a standardized, bulletproof environment including:
 1. Downstream repositories (e.g., `dicts`, `katersat`) should NOT clone this repository directly. Instead, include it in your `pyproject.toml` dependencies:
    ```toml
    dependencies = [
-       "oqaasileriffik_pipeline @ git+https://github.com/jandahl/Oqaasileriffik-template.git"
+       "oqaasileriffik-template @ git+https://github.com/jandahl/Oqaasileriffik-template.git"
    ]
    ```
 
