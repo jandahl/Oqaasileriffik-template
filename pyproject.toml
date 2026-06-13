@@ -24,7 +24,7 @@ dev = [
 ]
 
 [tool.setuptools]
-packages = ["oqaasileriffik_convert"]
+packages = ["oqaasileriffik_convert", "oqaasileriffik_pipeline"]
 
 [tool.setuptools.package-data]
 oqaasileriffik_convert = ["*.json"]
