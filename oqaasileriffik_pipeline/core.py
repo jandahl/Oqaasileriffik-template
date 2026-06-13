@@ -32,6 +32,14 @@ def write_atomic(path: Path | str, data: Any, indent: int | None = 2) -> None:
                 pass
         os.replace(tmp_path, path)
         written = True
+        try:
+            dir_fd = os.open(parent, os.O_RDONLY)
+            try:
+                os.fsync(dir_fd)
+            finally:
+                os.close(dir_fd)
+        except OSError:
+            pass
     finally:
         if not written:
             try:
