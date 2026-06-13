@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import copy
 import json
 import logging
 import os
@@ -55,12 +56,13 @@ class Pipeline:
     ):
         self.extractor_func = extractor_func
         self.schema_path = Path(schema_path)
-        self.meta = meta.copy()
+        self.meta = copy.deepcopy(meta)
         self.output_dir = Path(output_dir)
 
         # Load and parse schema early to fail fast if it is missing or invalid
         try:
             self.schema = json.loads(self.schema_path.read_text(encoding='utf-8'))
+            jsonschema.validators.validator_for(self.schema).check_schema(self.schema)
         except Exception as e:
             raise ValueError(f"Failed to load schema from {schema_path}: {e}") from e
 
