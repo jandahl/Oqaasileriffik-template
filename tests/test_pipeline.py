@@ -44,6 +44,16 @@ def test_pipeline_fail_fast_on_invalid_json(tmp_path: Path, mock_extractor: Call
         Pipeline(mock_extractor, invalid_schema, {})
 
 
+def test_pipeline_fail_fast_on_invalid_extractor() -> None:
+    with pytest.raises(TypeError, match="extractor_func must be a callable"):
+        Pipeline("not_a_callable", "schema.json", {})  # type: ignore
+
+
+def test_pipeline_fail_fast_on_invalid_meta(mock_extractor: Callable) -> None:
+    with pytest.raises(TypeError, match="meta must be a dictionary"):
+        Pipeline(mock_extractor, "schema.json", ["not", "a", "dict"])  # type: ignore
+
+
 def test_pipeline_missing_data_dir(valid_schema_path: Path, mock_extractor: Callable) -> None:
     pipeline = Pipeline(mock_extractor, valid_schema_path, {})
     with pytest.raises(FileNotFoundError, match="Data directory does not exist"):

@@ -62,6 +62,11 @@ class Pipeline:
         meta: dict[str, Any],
         output_dir: Path | str = Path("extracted")
     ):
+        if not callable(extractor_func):
+            raise TypeError("extractor_func must be a callable")
+        if not isinstance(meta, dict):
+            raise TypeError("meta must be a dictionary")
+
         self.extractor_func = extractor_func
         self.schema_path = Path(schema_path)
         self.meta = copy.deepcopy(meta)
