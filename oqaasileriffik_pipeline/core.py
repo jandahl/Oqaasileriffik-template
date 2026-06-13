@@ -73,7 +73,8 @@ class Pipeline:
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         # Update metadata timestamp automatically
-        self.meta["generated_at"] = datetime.now(timezone.utc).isoformat()
+        run_meta = copy.deepcopy(self.meta)
+        run_meta["generated_at"] = datetime.now(timezone.utc).isoformat()
 
         log.info("Starting data extraction...")
         source_map_entries = self.extractor_func(data_dir)
@@ -81,9 +82,8 @@ class Pipeline:
             raise TypeError(f"The extractor function must return a list of entries, got {type(source_map_entries).__name__}")
         log.info(f"Extracted {len(source_map_entries)} entries.")
 
-
         envelope = {
-            "meta": self.meta,
+            "meta": run_meta,
             "entries": source_map_entries
         }
 
