@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.scripts]
-run-extractor = "example_extractor.extractor:main"
+run-extractor = "example_extractor.example_extractor:main"
 
 [project.optional-dependencies]
 dev = [
