@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import secrets
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
@@ -16,7 +17,10 @@ log = logging.getLogger(__name__)
 
 def write_atomic(path: Path | str, data: Any, indent: int | None = 2) -> None:
     """Safely write JSON data to path using an atomic rename."""
-    path = Path(path)
+    if sys.platform.startswith("win") or sys.platform in ("msys", "cygwin"):
+        raise RuntimeError("Windows and Windows-based environments (msys, cygwin, mingw) are strictly unsupported.")
+
+    path = Path(path).resolve()
     parent = path.parent
     parent.mkdir(parents=True, exist_ok=True)
     tmp_path = parent / f".{path.name}.{secrets.token_hex(8)}.tmp"
@@ -62,6 +66,9 @@ class Pipeline:
         meta: dict[str, Any],
         output_dir: Path | str = Path("extracted")
     ):
+        if sys.platform.startswith("win") or sys.platform in ("msys", "cygwin"):
+            raise RuntimeError("Windows and Windows-based environments (msys, cygwin, mingw) are strictly unsupported.")
+
         if not callable(extractor_func):
             raise TypeError("extractor_func must be a callable")
         if not isinstance(meta, dict):
