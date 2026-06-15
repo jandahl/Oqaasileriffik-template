@@ -50,17 +50,10 @@ def _main_impl() -> None:
     parser.add_argument("--data-dir", type=Path, default=Path("data"), help="Path to input data directory")
     args = parser.parse_args()
 
-    if not args.data_dir.is_dir():
-        log.error(f"Data directory does not exist or is not a directory: {args.data_dir}")
-        sys.exit(1)
-
     # Paths
     script_dir = Path(__file__).resolve().parent
     schema_path = script_dir / "schema.json"
     extracted_dir = Path("extracted")
-
-    # Create output directory
-    extracted_dir.mkdir(parents=True, exist_ok=True)
 
     # Metadata Envelope
     meta = {
