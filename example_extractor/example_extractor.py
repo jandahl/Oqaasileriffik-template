@@ -48,12 +48,12 @@ def main() -> None:
 def _main_impl() -> None:
     parser = argparse.ArgumentParser(description="Oqaasileriffik Data Conversion Pipeline Template")
     parser.add_argument("--data-dir", type=Path, default=Path("data"), help="Path to input data directory")
+    parser.add_argument("--output-dir", type=Path, default=Path("extracted"), help="Path to output directory")
     args = parser.parse_args()
 
     # Paths
     script_dir = Path(__file__).resolve().parent
     schema_path = script_dir / "schema.json"
-    extracted_dir = Path("extracted")
 
     # Metadata Envelope
     meta = {
@@ -68,7 +68,7 @@ def _main_impl() -> None:
         extractor_func=extract_data,
         schema_path=schema_path,
         meta=meta,
-        output_dir=extracted_dir
+        output_dir=args.output_dir
     )
     
     pipeline.run(args.data_dir)
