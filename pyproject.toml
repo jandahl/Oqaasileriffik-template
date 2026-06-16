@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.scripts]
-convert-data = "oqaasileriffik_convert.convert:main"
+run-extractor = "example_extractor.example_extractor:main"
 
 [project.optional-dependencies]
 dev = [
@@ -24,10 +24,10 @@ dev = [
 ]
 
 [tool.setuptools]
-packages = ["oqaasileriffik_convert", "oqaasileriffik_pipeline"]
+packages = ["example_extractor", "oqaasileriffik_pipeline"]
 
 [tool.setuptools.package-data]
-oqaasileriffik_convert = ["*.json"]
+example_extractor = ["*.json"]
 
 [tool.mypy]
 python_version = "3.10"
