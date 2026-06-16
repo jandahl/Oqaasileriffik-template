@@ -10,6 +10,7 @@ from oqaasileriffik_pipeline import Pipeline
 # Configure basic logging
 log = logging.getLogger(__name__)
 
+
 def extract_data(input_dir: Path) -> list[dict[str, Any]]:
     """
     TODO: Implement parsing logic for the specific upstream data source.
@@ -50,7 +51,11 @@ def _main_impl(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Oqaasileriffik Data Conversion Pipeline Template")
     parser.add_argument("--data-dir", type=Path, default=Path("data"), help="Path to input data directory")
     parser.add_argument("--output-dir", type=Path, default=Path("extracted"), help="Path to output directory")
+    parser.add_argument("--verbose", action="store_true", help="Enable verbose/debug logging")
     args = parser.parse_args(argv)
+
+    if args.verbose:
+        logging.getLogger().setLevel(logging.DEBUG)
 
     # Paths
     script_dir = Path(__file__).resolve().parent
