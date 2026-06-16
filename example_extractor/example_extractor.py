@@ -4,6 +4,7 @@ import logging
 import sys
 from pathlib import Path
 from typing import Any
+import jsonschema
 
 from oqaasileriffik_pipeline import Pipeline
 
@@ -26,6 +27,8 @@ def extract_data(input_dir: Path) -> list[dict[str, Any]]:
         }
     ]
     """
+    log.info("Extracting data from %s", input_dir)
+    # Placeholder: return an empty list or mock data
     entries: list[dict[str, Any]] = []
     # e.g. parse files in input_dir...
     return entries
@@ -38,6 +41,9 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     except FileNotFoundError as e:
         log.error("File not found: %s", e)
+        return 1
+    except jsonschema.ValidationError:
+        # The pipeline already logs the validation error details
         return 1
     except OSError:
         log.exception("File operation failed")
