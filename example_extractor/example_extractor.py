@@ -54,6 +54,8 @@ def _main_impl() -> None:
     # Paths
     script_dir = Path(__file__).resolve().parent
     schema_path = script_dir / "schema.json"
+    if not schema_path.is_file():
+        raise FileNotFoundError(f"Schema file not found at {schema_path}")
 
     # Metadata Envelope
     meta = {
