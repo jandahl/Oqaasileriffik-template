@@ -48,6 +48,9 @@ def main(argv: list[str] | None = None) -> int:
     except OSError:
         log.exception("File operation failed")
         return 1
+    except ValueError as e:
+        log.error("Configuration error: %s", e)
+        return 1
     except Exception:
         log.exception("Execution failed")
         return 1
