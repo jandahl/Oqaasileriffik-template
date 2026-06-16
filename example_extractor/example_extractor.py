@@ -30,19 +30,20 @@ def extract_data(input_dir: Path) -> list[dict[str, Any]]:
     return entries
 
 
-def main(argv: list[str] | None = None) -> None:
+def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     try:
         _main_impl(argv)
+        return 0
     except FileNotFoundError as e:
         log.error("File not found: %s", e)
-        sys.exit(1)
+        return 1
     except OSError:
         log.exception("File operation failed")
-        sys.exit(1)
+        return 1
     except Exception:
         log.exception("Execution failed")
-        sys.exit(1)
+        return 1
 
 
 def _main_impl(argv: list[str] | None = None) -> None:
@@ -77,4 +78,4 @@ def _main_impl(argv: list[str] | None = None) -> None:
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
